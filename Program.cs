@@ -31,6 +31,8 @@ namespace Market
             app.MapControllers();
 
             app.Run();
+
+
         }
     }
 }
