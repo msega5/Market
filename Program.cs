@@ -29,6 +29,7 @@ namespace Market
 
             //builder.Services.AddSingleton<IProductRepository, ProductRepository>(); //та же регистрация что и 3 строки выше
 
+            builder.Services.AddMemoryCache(o=>o.TrackStatistics=true);
 
             var app = builder.Build();
 
