@@ -24,11 +24,11 @@ namespace Market.Controllers
                         }
                         context.Group.Remove(group);
                         context.SaveChanges();
-                        return Ok();
+                        return Ok("Group delete succsessful");
                     }
                     else
                     {
-                        return NotFound();
+                        return NotFound("Group not found");
                     }
                 }
             }
@@ -50,11 +50,11 @@ namespace Market.Controllers
                     {   
                         context.Products.Remove(product);
                         context.SaveChanges();
-                        return Ok();
+                        return Ok("Product delete succsessful");
                     }
                     else
                     {
-                        return NotFound();
+                        return NotFound("Product not found");
                     }
                 }
             }

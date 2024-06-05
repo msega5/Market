@@ -19,11 +19,11 @@ namespace Market.Controllers
                     {
                         product.Price = newPrice;
                         context.SaveChanges();
-                        return Ok();
+                        return Ok("Price update succsessfull");
                     }
                     else
                     {
-                        return NotFound();
+                        return NotFound("Product not found");
                     }
                 }
             }

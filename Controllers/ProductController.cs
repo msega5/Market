@@ -53,7 +53,7 @@ namespace Market.Controllers
                         return StatusCode(409);
                     }
                 }
-                return Ok();
+                return Ok("Product added succsessfull");
             }
             catch
             {
