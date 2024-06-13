@@ -61,7 +61,7 @@ namespace Market.Controllers
             using (var _productRepository = new StoreContext())
             {
                 var products = _productRepository.Products.Select(x => new ProductDTO { Description = x.Description, Price = x.Price }).ToList();
-                var content = GetCsv(products);
+                var content = GetCsv((IEnumerable<Product>)products);
                 return File(new System.Text.UTF8Encoding().GetBytes(content), "text/csv", "report.csv");
             }
         }

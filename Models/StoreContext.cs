@@ -2,7 +2,6 @@
 
 
 
-
 namespace Market.Models
 {
     public class StoreContext : DbContext
@@ -10,11 +9,27 @@ namespace Market.Models
         public DbSet<Store> Store { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Group> Group { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+        private string _connectionString;
+
+        public StoreContext()
         {
-            optionsBuilder.UseNpgsql("Host=localhost;Port=9150;Database=Market;Username=postgres;Password=9150")
-                .UseLazyLoadingProxies();      
         }
+
+        public StoreContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+       => optionsBuilder.UseLazyLoadingProxies().UseNpgsql(_connectionString);
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseNpgsql("Host=localhost;Port=9150;Database=Market;Username=postgres;Password=9150")
+        //        .UseLazyLoadingProxies();
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,11 +87,11 @@ namespace Market.Models
                 entity
                         .Property(e => e.Count)
                         .HasColumnName("ProductCount");
-              
+
                 entity
-                        .HasMany(x=>x.Products)
+                        .HasMany(x => x.Products)
                         .WithMany(m => m.Stores)
-                        .UsingEntity(j=>j.ToTable("StorageName"));
+                        .UsingEntity(j => j.ToTable("StorageName"));
             });
         }
     }

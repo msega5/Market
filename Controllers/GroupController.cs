@@ -2,27 +2,22 @@
 using Market.Models;
 using Market.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Market.Controllers
 {
 
     [ApiController]
     [Route("[controller]")]
-    public class GroupController : Controller
+    public class GroupController : ControllerBase
     {
         private readonly IGroupRepository _groupRepository;
+        private readonly IMemoryCache _cache;
 
-        public GroupController(IGroupRepository groupRepository)
+        public GroupController(IGroupRepository groupRepository, IMemoryCache cache)
         {
             _groupRepository = groupRepository;
-        }
-
-
-        [HttpGet("get_groups")]
-        public IActionResult GetGroups()
-        {
-            var groups = _groupRepository.GetGroups();
-            return Ok(groups);
+            _cache = cache;
         }
 
 
@@ -30,7 +25,21 @@ namespace Market.Controllers
         public IActionResult AddGroup([FromBody] GroupDTO groupDTO)
         {
             var result = _groupRepository.AddGroup(groupDTO);
+            _cache.Remove("groups");
             return Ok(result);
+        }
+
+
+        [HttpGet("get_groups")]
+        public IActionResult GetGroups()
+        {
+            if (_cache.TryGetValue("groups", out List<Group> groups))
+            {
+                return Ok(groups);
+            }
+            groups = _groupRepository.GetGroups().Select(x => new Group { Name = x.Name }).ToList();
+            _cache.Set("groups", groups, TimeSpan.FromMinutes(30));
+            return Ok(groups);
         }
 
 

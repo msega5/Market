@@ -1,9 +1,8 @@
-
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Market.Abstraction;
+using Market.Models;
 using Market.Repo;
-using System.ComponentModel;
+using Microsoft.Extensions.FileProviders;
 
 namespace Market
 {
@@ -12,29 +11,29 @@ namespace Market
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddMemoryCache();
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+            var config = new ConfigurationBuilder();
+            config.AddJsonFile("appsettings.json");
+            var cfg = config.Build();
 
             builder.Host.ConfigureContainer<ContainerBuilder>(contaierBuilder =>
             {
-                contaierBuilder.RegisterType<ProductRepository>().As<IProductRepository>();
+                contaierBuilder.Register(c => new StoreContext(cfg.GetConnectionString("db"))).InstancePerDependency();
             });
 
-            //builder.Services.AddSingleton<IProductRepository, ProductRepository>(); //та же регистрация что и 3 строки выше
+            builder.Services.AddMemoryCache(options =>
+            {
+                options.TrackStatistics = true;
+            });
 
-            builder.Services.AddMemoryCache(o=>o.TrackStatistics=true);
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -42,15 +41,17 @@ namespace Market
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
+            var staticFilesPath = Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles");
+            Directory.CreateDirectory(staticFilesPath);
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    staticFilesPath),
+                RequestPath = "/static"
+            });
             app.MapControllers();
-
             app.Run();
-
-
         }
     }
 }
