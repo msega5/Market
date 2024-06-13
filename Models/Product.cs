@@ -1,4 +1,5 @@
-﻿namespace Market.Models
+﻿
+namespace Market.Models
 {
     public class Product : BaseModel
     {
@@ -7,5 +8,7 @@
         public virtual Group Group { get; set; } = null!;
         public int Price { get; set; }
         public virtual List<Store> Stores { get; set; } = null!;
+
+        
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using System.Reflection.Emit;
+
+
+
 
 namespace Market.Models
 {
@@ -11,9 +12,10 @@ namespace Market.Models
         public DbSet<Group> Group { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=gb;Integrated Security=True;TrustServerCertificate=True;Trusted_Connection=True;")
-                .UseLazyLoadingProxies();
+            optionsBuilder.UseNpgsql("Host=localhost;Port=9150;Database=Market;Username=postgres;Password=9150")
+                .UseLazyLoadingProxies();      
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

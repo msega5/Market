@@ -17,20 +17,6 @@ namespace Market.Controllers
             _productRepository = productRepository;
         }
 
-        [HttpGet("get_products")]
-        public IActionResult GetProducts()
-        {
-            var products = _productRepository.GetProducts();
-                    return Ok(products);
-        }
-
-        [HttpGet("get_groups")]
-        public IActionResult GetGroups()
-        {
-            var groups = _productRepository.GetGroups();
-            return Ok(groups);
-        }
-
         [HttpPost("add_product")]
         public IActionResult AddProduct([FromBody] ProductDTO productDTO)
         {
@@ -38,11 +24,66 @@ namespace Market.Controllers
             return Ok(result);
         }
 
-        [HttpPost("add_group")]
-        public IActionResult AddGroup([FromBody] GroupDTO groupDTO)
+
+        [HttpGet("get_products")]
+        public IActionResult GetProducts()
         {
-            var result = _productRepository.AddGroup(groupDTO);
-            return Ok(result);
+            var products = _productRepository.GetProducts();
+                    return Ok(products);
+        }
+
+
+        [HttpPut("priceUpdate/{productID}")]
+        public IActionResult PriceUpdate(int productID, [FromQuery] int newPrice)
+        {
+            try
+            {
+                using (var context = new StoreContext())
+                {
+                    var product = context.Products.Find(productID);
+                    if (product != null)
+                    {
+                        product.Price = newPrice;
+                        context.SaveChanges();
+                        return Ok();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpDelete("deleteProduct/{productID}")]
+        public IActionResult DeleteProduct(int productID)
+        {
+            try
+            {
+                using (var context = new StoreContext())
+                {
+                    var product = context.Products.Find(productID);
+                    if (product != null)
+                    {
+                        context.Products.Remove(product);
+                        context.SaveChanges();
+                        return Ok();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }
